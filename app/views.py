@@ -11,9 +11,7 @@ from operator import methodcaller
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse,HttpResponse
 # 图片处理模块
-import cv2
 import base64
-import numpy as np
 import json
 # 主要是支撑算法模块
 class ImgModule():
