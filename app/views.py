@@ -46,6 +46,54 @@ class ImgModule():
     ###############################################################################
     ##################### 以下算法为图像识别的基础算法 ###########################################
     ##############################################################################
+    # canny 边缘检测
+    def cannyFilters(self):
+        src = cv2.cvtColor(self.img_base64_data, cv2.COLOR_RGB2BGR)
+
+        # t1 = 100, t2 = 3*t1 = 300
+        edge = cv2.Canny(src, 100, 300)
+
+        edge_src = cv2.bitwise_and(src, src, mask=edge)
+
+        h, w = src.shape[:2]
+        result = np.zeros([h, w * 2, 3], dtype=src.dtype)
+        result[0:h, 0:w, :] = src
+        result[0:h, w:2 * w, :] = edge_src
+        cv2.putText(result, "original image", (10, 30), cv2.FONT_ITALIC, 1.0, (0, 0, 255), 2)
+        cv2.putText(result, "edge image", (w + 10, 30), cv2.FONT_ITALIC, 1.0, (0, 0, 255), 2)
+        return result
+    #Sobel 算子
+    def sobelFilters(self):
+        src = cv2.cvtColor(self.img_base64_data, cv2.COLOR_RGB2BGR)
+
+        h, w = src.shape[:2]
+        x_grad = cv2.Sobel(src, cv2.CV_32F, 1, 0)
+        y_grad = cv2.Sobel(src, cv2.CV_32F, 0, 1)
+
+        x_grad = cv2.convertScaleAbs(x_grad)
+        y_grad = cv2.convertScaleAbs(y_grad)
+        # cv.imshow("x_grad", x_grad)
+        # cv.imshow("y_grad", y_grad)
+
+        dst = cv2.add(x_grad, y_grad, dtype=cv.CV_16S)
+        dst = cv2.convertScaleAbs(dst)
+        return dst
+    #Y Flip
+    def yFlip(self):
+        image_to_read = cv2.flip(self.img_base64_data, 1)
+        return image_to_read
+    #X Flip
+    def xFlip(self):
+        image_to_read = cv2.flip(self.img_base64_data, 0)
+        return image_to_read
+    # 图像像素值统计
+    def pixelValueStatistics(self):
+        image_to_read = cv2.cvtColor(self.img_base64_data, cv2.COLOR_BGR2GRAY)
+        min, max, minLoc, maxLoc = cv2.minMaxLoc(image_to_read)
+        means, stddev = cv2.meanStdDev(image_to_read)
+        image_to_read[np.where(image_to_read < means)] = 0
+        image_to_read[np.where(image_to_read > means)] = 255
+        return image_to_read
     # 图片变成灰度图像
     def toGray(self):
         image_to_read = cv2.cvtColor(self.img_base64_data, cv2.COLOR_BGR2GRAY)
